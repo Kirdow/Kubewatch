@@ -26,6 +26,8 @@ namespace Kubewatch
         public Text SmallTimerText;
         [Space]
         public GameObject SolveHistoryEntryPrefab;
+        [Space]
+        public UITextFormat CubeFlipText;
 
         [Header("Faces")]
         public Face FrontFace;
@@ -105,6 +107,7 @@ namespace Kubewatch
         void Start()
         {
             ScrambleCube();
+            UpdateFlipMode(EFlipMode.None);
         }
 
         void ScrambleCube()
@@ -167,6 +170,8 @@ namespace Kubewatch
             {
                 FlipCubeColors();
             }
+
+            CubeFlipText.Text = _flipMode.GetDisplayString();
         }
 
         private void CheckInput()
