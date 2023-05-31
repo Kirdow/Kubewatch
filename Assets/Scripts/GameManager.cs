@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using Kubewatch.Data;
+using Kubewatch.UI;
 
 namespace Kubewatch
 {
@@ -21,6 +23,8 @@ namespace Kubewatch
         [Space]
         public Text BigTimerText;
         public Text SmallTimerText;
+        [Space]
+        public GameObject SolveHistoryEntryPrefab;
 
         [Header("Faces")]
         public Face FrontFace;
@@ -37,6 +41,8 @@ namespace Kubewatch
         private bool _solveActive = false;
         private float _timerStart = -1.0f;
         private float _timeElapsed = -1.0f;
+
+        private Scrambler _scrambler = null;
         
         void Awake()
         {
@@ -90,11 +96,11 @@ namespace Kubewatch
         {
             Random.InitState(Random.Range(0xFFFFFF, 0x7FFFFFFF));
             
-            Scrambler scr = new Scrambler(25);
+            _scrambler = new Scrambler(25);
 
-            ScrambleText.Text = scr.Sequence;
+            ScrambleText.Text = _scrambler.Sequence;
             
-            StartCoroutine(RunScrambleAnimation(scr.Sequence));
+            StartCoroutine(RunScrambleAnimation(_scrambler.Sequence));
         }
 
         private IEnumerator RunScrambleAnimation(string[] sequence)
@@ -155,11 +161,24 @@ namespace Kubewatch
 
         private void StopTimer()
         {
-            string display = GetElapsed();            
+            string display = GetElapsed();
+            var solve = new Solve(_scrambler.Sequence, _timeElapsed);
+            
             SmallTimerText.text = display;
             _keyTime = Time.time;
             SmallTimerText.color = Color.green;
             ScrambleCube();
+
+            SolveHistory.AddSolve(solve);
+            UISolveHistory.Inst.Reload();            
+        }
+
+        public void Recall(Solve solve)
+        {
+            if (_solveActive) return;
+
+            SetSolving(false);
+            SmallTimerText.text = solve.ElapsedString;
         }
 
         private string GetElapsed()
@@ -167,24 +186,15 @@ namespace Kubewatch
             float timeNow = Time.time;
             _timeElapsed = timeNow - _timerStart;
 
-            int seconds = (int)_timeElapsed;
-            int ms = (int)(_timeElapsed * 1000.0f) % 1000;
-
-            int minutes = seconds / 60;
-            seconds %= 60;
-
-            return $"{minutes}:{seconds.ToString().PadLeft(2, '0')}.{ms.ToString().PadLeft(3, '0')}";
+            return Solve.GetElapsedString(_timeElapsed);
         }
 
         public void SetSolving(bool state)
         {
-            if (_solveActive != state)
-            {
-                TextObject.SetActive(!state);
-                TimerObject.SetActive(state);
-                TimeObject.SetActive(!state);
-                CubeObject.SetActive(!state);
-            }
+            TextObject.SetActive(!state);
+            TimerObject.SetActive(state);
+            TimeObject.SetActive(!state);
+            CubeObject.SetActive(!state);
 
             _solveActive = state;
         }
