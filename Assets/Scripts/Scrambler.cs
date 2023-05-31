@@ -34,10 +34,10 @@ namespace Kubewatch
                 "'",
                 "2"
             };
-
+            
             for (int j = 0; j < Turns; )
             {
-                int k = Random.Range(0, sides.Count);
+                int k = Random.Range(0, sideArray.Length);
                 ScrambleSide next = sideArray[k];
                 if (!sides.Contains(next)) continue;
 
