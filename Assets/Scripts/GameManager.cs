@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Kubewatch.Data;
 using Kubewatch.UI;
+using Kubewatch.Enums;
 
 namespace Kubewatch
 {
@@ -41,6 +42,8 @@ namespace Kubewatch
         private bool _solveActive = false;
         private float _timerStart = -1.0f;
         private float _timeElapsed = -1.0f;
+
+        private EFlipMode _flipMode = EFlipMode.None;
 
         private Scrambler _scrambler = null;
         
@@ -85,6 +88,18 @@ namespace Kubewatch
                     face.Turn();
                     break;
             }
+        }
+
+        public void FlipCubeColors()
+        {
+            EStickerColor facing = EStickerColor.Green;
+
+            TopFace.FlipColors(facing);
+            LeftFace.FlipColors(facing);
+            RightFace.FlipColors(facing);
+            BottomFace.FlipColors(facing);
+            BackFace.FlipColors(facing);
+            FrontFace.FlipColors(facing);
         }
 
         void Start()
@@ -141,15 +156,43 @@ namespace Kubewatch
             }
         }
 
+        private void UpdateFlipMode(EFlipMode prevMode)
+        {
+            CubeObject.transform.rotation = Quaternion.AngleAxis(45.0f, Vector3.up);
+            if (_flipMode == EFlipMode.Orientation) {
+                CubeObject.transform.rotation *= Quaternion.AngleAxis(180.0f, Vector3.forward);
+            }
+
+            if (_flipMode == EFlipMode.Color || prevMode == EFlipMode.Color)
+            {
+                FlipCubeColors();
+            }
+        }
+
         private void CheckInput()
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
+                EFlipMode flipMode = _flipMode;
+                _flipMode = EFlipMode.None;
+                UpdateFlipMode(EFlipMode.None);
+
                 bool state = _solveActive;
                 SetSolving(!_solveActive);
                 
                 if (state) StopTimer();
                 else StartTimer();
+
+                _flipMode = flipMode;
+                UpdateFlipMode(EFlipMode.None);
+            }
+
+            if (Input.GetKeyDown(KeyCode.Tab))
+            {
+                EFlipMode flipMode = _flipMode;
+                _flipMode = (EFlipMode)(((int)_flipMode + 1) % 3);
+
+                UpdateFlipMode(flipMode);
             }
         }
 

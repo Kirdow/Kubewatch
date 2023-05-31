@@ -71,6 +71,41 @@ namespace Kubewatch
             _stickers[to.x, to.y].SetColor(colors[2]);
         }
 
+        public void FlipColors(EStickerColor facing)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    _stickers[i, j].SetColor(GetFlippedColor(_stickers[i, j].StickerColor, facing));
+                }
+            }
+        }
+
+        public static EStickerColor GetFlippedColor(EStickerColor color)
+        {
+            switch (color)
+            {
+                case EStickerColor.White: return EStickerColor.Yellow;
+                case EStickerColor.Yellow: return EStickerColor.White;
+                case EStickerColor.Green: return EStickerColor.Blue;
+                case EStickerColor.Blue: return EStickerColor.Green;
+                case EStickerColor.Orange: return EStickerColor.Red;
+                case EStickerColor.Red: return EStickerColor.Orange;
+                default: return color;
+            }
+        }
+
+        public static EStickerColor GetFlippedColor(EStickerColor color, EStickerColor facing)
+        {
+            if (color == facing) return color;
+
+            var result = GetFlippedColor(color);
+            if (result == facing) return color;
+
+            return result;
+        }
+
         public void RotateFace(bool clockwise = true)
         {
             EStickerColor color;
