@@ -121,15 +121,16 @@ namespace Kubewatch.UI
             _average3of5Text.Text = "--";
             _average10of12Text.Text = "--";
 
+            var solves = _solves.OrderByDescending(p => p.Solve.Time).ToArray();
             float averageValue = _solves.Length == 0 ? 0.0f : (_solves.Select(p => p.Solve.Elapsed).Sum() / _solves.Length);
             var sorted = _solves.OrderBy(p => p.Solve.Elapsed).ToArray();
             SortedSolve worst = sorted.Length > 0 ? sorted[sorted.Length - 1] : null;
             SortedSolve best = sorted.Length > 0 ? sorted[0] : null;
             
             List<float> floats = new List<float>();
-            for (int i = 0; i < sorted.Length; i++)
+            for (int i = 0; i < solves.Length; i++)
             {
-                floats.Add(sorted[i].Solve.Elapsed);
+                floats.Add(solves[i].Solve.Elapsed);
                 
                 if (floats.Count == 5)
                 {

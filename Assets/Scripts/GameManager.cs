@@ -174,9 +174,11 @@ namespace Kubewatch
             CubeFlipText.Text = _flipMode.GetDisplayString();
         }
 
+        private bool TimerKeyDown => _solveActive && Input.anyKeyDown || Input.GetKeyDown(KeyCode.Space);
+
         private void CheckInput()
         {
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (TimerKeyDown)
             {
                 EFlipMode flipMode = _flipMode;
                 _flipMode = EFlipMode.None;
