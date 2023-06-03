@@ -16,6 +16,7 @@ namespace Kubewatch
         public MeshRenderer CubeMesh;
         public Material CubeMaterialNormal;
         public Material CubeMaterialScramble;
+        public SpriteRenderer LogoStickerSprite;
         [Space]
         public GameObject CubeObject;
         public GameObject TextObject;
@@ -163,6 +164,10 @@ namespace Kubewatch
             if (_solveActive)
             {
                 BigTimerText.text = GetElapsed();
+            }
+            else
+            {
+                LogoStickerSprite.enabled = _flipMode != EFlipMode.Color;
             }
         }
 
