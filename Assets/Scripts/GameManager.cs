@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Kubewatch.Data;
 using Kubewatch.UI;
 using Kubewatch.Enums;
+using Kubewatch.Options;
 
 namespace Kubewatch
 {
@@ -62,6 +63,8 @@ namespace Kubewatch
 
             DontDestroyOnLoad(gameObject);
             I = this;
+
+            _flipMode = Prefs.FlipMode;
         }
 
         public Face GetFace(string name)
@@ -210,6 +213,7 @@ namespace Kubewatch
             {
                 EFlipMode flipMode = _flipMode;
                 _flipMode = (EFlipMode)(((int)_flipMode + 1) % 3);
+                Prefs.FlipMode = _flipMode;
 
                 UpdateFlipMode(flipMode);
             }

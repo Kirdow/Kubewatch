@@ -2,9 +2,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using Kubewatch.Data;
 using Kubewatch.Enums;
+using Kubewatch.Options;
 using System.Collections.Generic;
 using System.Linq;
-using System;
 
 namespace Kubewatch.UI
 {
@@ -51,6 +51,9 @@ namespace Kubewatch.UI
         void Awake()
         {
             Inst = this;
+
+            _sortType = Prefs.SortType;
+            _sortDir = Prefs.SortDirection;
         }
 
         void Start()
@@ -74,6 +77,11 @@ namespace Kubewatch.UI
                 _sortDir = _sortDir == ESortDirection.Ascending ? ESortDirection.Descending : ESortDirection.Ascending;
             
             _sortType = sortType;
+
+            Prefs.SavePrefs(p => {
+                p._SortType = _sortType;
+                p._SortDirection = _sortDir;
+            });
             
             UpdateSort();
         }
