@@ -52,18 +52,11 @@ namespace Kubewatch.Data
         {
             Dispatcher.RunAsync(() =>
             {
-                try
+                var result = LoadSolveHistory(GetFilePath());
+                Dispatcher.RunOnMainThread(() =>
                 {
-                    var result = LoadSolveHistory(GetFilePath());
-                    Dispatcher.RunOnMainThread(() =>
-                    {
-                        callback(result);
-                    });
-                }
-                catch (Exception e)
-                {
-                    Debug.LogException(e);
-                }
+                    callback(result);
+                });
             });
         }
 

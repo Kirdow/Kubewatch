@@ -7,12 +7,34 @@ public class Dispatcher : MonoBehaviour
 {
     public static void RunAsync(Action action)
     {
-        ThreadPool.QueueUserWorkItem(p => action());
+        ThreadPool.QueueUserWorkItem(p =>
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Error in Dispatcher.RunAsync Callback");
+                Debug.LogException(e);
+            }
+        });
     }
 
     public static void RunAsync<T>(Action<T> action, T state)
     {
-        ThreadPool.QueueUserWorkItem(p => action((T)p), (object)state);
+        ThreadPool.QueueUserWorkItem(p =>
+        {
+            try
+            {
+                action((T)p);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Error in Dispatcher.RunAsync<T> Callback");
+                Debug.LogException(e);
+            }
+        }, (object)state);
     }
 
     public static void RunOnMainThread(Action action)
@@ -46,7 +68,17 @@ public class Dispatcher : MonoBehaviour
             }
 
             foreach (var action in _actions)
-                action();
+            {
+                try
+                {
+                    action();
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("Error in Dispatcher.RunOnMainThread Callback");
+                    Debug.LogException(e);
+                }
+            }
 
             _actions.Clear();
         }
