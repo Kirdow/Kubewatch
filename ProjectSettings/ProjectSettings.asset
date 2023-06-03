@@ -269,6 +269,13 @@ PlayerSettings:
   AndroidValidateAppBundleSize: 1
   AndroidAppBundleSizeToValidate: 150
   m_BuildTargetIcons:
+  - m_BuildTarget: 
+    m_Icons:
+    - serializedVersion: 2
+      m_Icon: {fileID: 2800000, guid: c21bf127428ea9743ba887396126ec5d, type: 3}
+      m_Width: 128
+      m_Height: 128
+      m_Kind: 0
   - m_BuildTarget: Standalone
     m_Icons:
     - serializedVersion: 2
@@ -277,7 +284,7 @@ PlayerSettings:
       m_Height: 1024
       m_Kind: 0
     - serializedVersion: 2
-      m_Icon: {fileID: 2800000, guid: c21bf127428ea9743ba887396126ec5d, type: 3}
+      m_Icon: {fileID: 0}
       m_Width: 512
       m_Height: 512
       m_Kind: 0
@@ -310,13 +317,6 @@ PlayerSettings:
       m_Icon: {fileID: 0}
       m_Width: 16
       m_Height: 16
-      m_Kind: 0
-  - m_BuildTarget: 
-    m_Icons:
-    - serializedVersion: 2
-      m_Icon: {fileID: 2800000, guid: c21bf127428ea9743ba887396126ec5d, type: 3}
-      m_Width: 128
-      m_Height: 128
       m_Kind: 0
   m_BuildTargetPlatformIcons: []
   m_BuildTargetBatching: []
