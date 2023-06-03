@@ -48,6 +48,8 @@ namespace Kubewatch
         private EFlipMode _flipMode = EFlipMode.None;
 
         private Scrambler _scrambler = null;
+
+        private bool _scrambling = false;
         
         void Awake()
         {
@@ -112,12 +114,14 @@ namespace Kubewatch
 
         void ScrambleCube()
         {
+            Random.InitState((int)(System.DateTimeOffset.UtcNow.ToUnixTimeSeconds() & 0x7FFFFFFF));
             Random.InitState(Random.Range(0xFFFFFF, 0x7FFFFFFF));
             
             _scrambler = new Scrambler(25);
 
             ScrambleText.Text = _scrambler.Sequence;
             
+            _scrambling = false;
             StartCoroutine(RunScrambleAnimation(_scrambler.Sequence));
         }
 
@@ -128,8 +132,9 @@ namespace Kubewatch
             yield return new WaitForSeconds(ScrambleDelay);
 
             CubeMesh.material = CubeMaterialScramble;
-            
-            for (int i = 0; i < sequence.Length; i++)
+
+            _scrambling = true;            
+            for (int i = 0; i < sequence.Length && _scrambling; i++)
             {
                 string notation = sequence[i];
                 TurnFaceFromNotation(notation);
@@ -141,6 +146,8 @@ namespace Kubewatch
 
             ScrambleText.Highlight = -1;
             CubeMesh.material = CubeMaterialNormal;
+
+            _scrambling = false;
         }
 
         private float _keyTime = -1.0f;
@@ -221,6 +228,11 @@ namespace Kubewatch
 
             SolveHistory.AddSolve(solve);
             UISolveHistory.Inst.Reload();            
+        }
+
+        public void OnSkipScramble()
+        {
+            ScrambleCube();
         }
 
         public void Recall(Solve solve)
