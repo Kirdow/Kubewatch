@@ -94,7 +94,7 @@ namespace Kubewatch.UI
 
         public void OnRestorePress()
         {
-            SolveHistory.ResoreSolve(success =>
+            SolveHistory.RestoreSolve(success =>
             {
                 if (success) Reload();
             });

@@ -102,7 +102,7 @@ namespace Kubewatch.Data
             });
         }
 
-        public static void ResoreSolve(Action<bool> callback)
+        public static void RestoreSolve(Action<bool> callback)
         {
             if (_removedSolve?.Solve == null)
             {
