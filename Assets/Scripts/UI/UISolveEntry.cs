@@ -56,8 +56,7 @@ namespace Kubewatch.UI
         {
             if (_solve == null || Index < 0) return;
 
-            SolveHistory.RemoveSolve(Index);
-            UISolveHistory.Inst.Reload();
+            SolveHistory.RemoveSolve(Index, () => UISolveHistory.Inst.Reload());
         }
 
         public void OnRecall()

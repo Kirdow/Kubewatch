@@ -20,9 +20,8 @@ namespace Kubewatch
         public SpriteRenderer LogoStickerSprite;
         [Space]
         public GameObject CubeObject;
-        public GameObject TextObject;
-        public GameObject TimerObject;
-        public GameObject TimeObject;
+        public GameObject[] TimerVisibleObjects;
+        public GameObject[] TimerHiddenObjects;
         [Space]
         public Text BigTimerText;
         public Text SmallTimerText;
@@ -235,8 +234,7 @@ namespace Kubewatch
             SmallTimerText.color = Color.green;
             ScrambleCube();
 
-            SolveHistory.AddSolve(solve);
-            UISolveHistory.Inst.Reload();            
+            SolveHistory.AddSolve(solve, () => UISolveHistory.Inst.Reload());
         }
 
         public void OnSkipScramble()
@@ -262,10 +260,15 @@ namespace Kubewatch
 
         public void SetSolving(bool state)
         {
-            TextObject.SetActive(!state);
-            TimerObject.SetActive(state);
-            TimeObject.SetActive(!state);
-            CubeObject.SetActive(!state);
+            foreach (var obj in TimerVisibleObjects)
+            {
+                if (obj != null) obj.SetActive(state);
+            }
+
+            foreach (var obj in TimerHiddenObjects)
+            {
+                if (obj != null) obj.SetActive(!state);
+            }
 
             _solveActive = state;
         }

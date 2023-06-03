@@ -25,6 +25,8 @@ namespace Kubewatch.UI
         [SerializeField] private UITextFormat _btnSortTimeText;
         [Space]
         [SerializeField] private Button _btnRestore;
+        [Space]
+        [SerializeField] private UITextFormat _historyCount;
 
         private SortedSolve[] _solves = new SortedSolve[0];
 
@@ -42,6 +44,7 @@ namespace Kubewatch.UI
                 var solves = value ?? new Solve[0];
                 _solves = new SortedSolve[solves.Length];
                 for (int i = 0; i < _solves.Length; i++) _solves[i] = new SortedSolve(i, solves[i]);
+                _historyCount.Set(_solves.Length);
                 
                 UpdateSort();
                 UpdateRestore();
@@ -63,8 +66,11 @@ namespace Kubewatch.UI
 
         public void Reload()
         {
-            Solves = SolveHistory.GetSolves();
-            Debug.Log($"Loaded {_solves.Length} solves!");
+            SolveHistory.GetSolves(solves =>
+            {
+                Solves = solves;
+                Debug.Log($"Loaded {_solves.Length} solves!");
+            });
         }
 
         public void OnSortPress(int sortTypeInt)
@@ -88,8 +94,10 @@ namespace Kubewatch.UI
 
         public void OnRestorePress()
         {
-            if (SolveHistory.ResoreSolve())
-                Reload();
+            SolveHistory.ResoreSolve(success =>
+            {
+                if (success) Reload();
+            });
         }
 
         public void UpdateRestore()
@@ -113,6 +121,7 @@ namespace Kubewatch.UI
 
             UpdateContent();
         }
+
 
         public void UpdateContent()
         {

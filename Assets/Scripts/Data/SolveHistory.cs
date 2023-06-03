@@ -48,67 +48,102 @@ namespace Kubewatch.Data
 
         private static string GetFilePath() => FileData.GetDataFile("history.yml");
         
-        private static SolveHistory GetSolveHistory()
+        private static void GetSolveHistory(Action<SolveHistory> callback)
         {
-            return LoadSolveHistory(GetFilePath());
-        }
-
-        private static void SetSolveHistory(SolveHistory history)
-        {
-            SaveSolveHistory(GetFilePath(), history);
-        }
-
-        public static void AddSolve(Solve solve)
-        {
-            var history = GetSolveHistory();
-            var list = history.Solves.ToList();
-            list.Add(solve);
-            history.Solves = list.ToArray();
-            SetSolveHistory(history);
-        }
-
-        public static void RemoveSolve(int index)
-        {
-            var history = GetSolveHistory();
-            var list = history.Solves.ToList();
-            int solveIndex = index >= 0 ? index : (list.Count + index);
-            if (solveIndex < list.Count && solveIndex >= 0)
+            Dispatcher.RunAsync(() =>
             {
-                Solve solve = list[solveIndex];
-                RemovedSolve removedSolve = new RemovedSolve(solve, _removedSolve);
-                _removedSolve = removedSolve;
-                list.RemoveAt(solveIndex);
+                try
+                {
+                    var result = LoadSolveHistory(GetFilePath());
+                    Dispatcher.RunOnMainThread(() =>
+                    {
+                        callback(result);
+                    });
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                }
+            });
+        }
+
+        private static void SetSolveHistory(SolveHistory history, Action callback)
+        {
+            Dispatcher.RunAsync(() =>
+            {
+                SaveSolveHistory(GetFilePath(), history);
+                Dispatcher.RunOnMainThread(() =>
+                {
+                    callback();
+                });
+            });
+        }
+
+        public static void AddSolve(Solve solve, Action callback)
+        {
+            GetSolveHistory(history =>
+            {
+                var list = history.Solves.ToList();
+                list.Add(solve);
+                history.Solves = list.ToArray();
+                SetSolveHistory(history, callback);
+            });
+        }
+
+        public static void RemoveSolve(int index, Action callback)
+        {
+            GetSolveHistory(history =>
+            {
+                var list = history.Solves.ToList();
+                int solveIndex = index >= 0 ? index : (list.Count + index);
+                if (solveIndex < list.Count && solveIndex >= 0)
+                {
+                    Solve solve = list[solveIndex];
+                    RemovedSolve removedSolve = new RemovedSolve(solve, _removedSolve);
+                    _removedSolve = removedSolve;
+                    list.RemoveAt(solveIndex);
+                }
+
+                history.Solves = list.ToArray();
+                SetSolveHistory(history, callback);
+            });
+        }
+
+        public static void ResoreSolve(Action<bool> callback)
+        {
+            if (_removedSolve?.Solve == null)
+            {
+                callback(false);
+                return;
             }
 
-            history.Solves = list.ToArray();
-            SetSolveHistory(history);
-        }
-
-        public static bool ResoreSolve()
-        {
-            if (_removedSolve?.Solve == null) return false;
-
-            var history = GetSolveHistory();
-            var list = history.Solves.ToList();
-            _removedSolve = _removedSolve?.Restore(list);
-            history.Solves = list.ToArray();
-            SetSolveHistory(history);
-
-            return true;
+            GetSolveHistory(history =>
+            {
+                var list = history.Solves.ToList();
+                _removedSolve = _removedSolve?.Restore(list);
+                history.Solves = list.ToArray();
+                SetSolveHistory(history, () => callback(true));
+            });
         }
 
         public static bool HasRemovedSolves() => _removedSolve?.Solve != null;
 
-        public static Solve[] GetSolves(int count = -1)
+        public static void GetSolves(Action<Solve[]> callback, int _count = -1)
         {
-            var history = GetSolveHistory();
-            count = Math.Min(count, history.Solves.Length);
-            if (count < 0) count = history.Solves.Length;
-            if (count == 0) return new Solve[0];
+            GetSolveHistory(history =>
+            {
+                int count = Math.Min(_count, history.Solves.Length);
+                if (count < 0) count = history.Solves.Length;
+                if (count == 0)
+                {
+                    callback(new Solve[0]);
+                    return;
+                }
 
-            var result = new Solve[count];
-            Array.Copy(history.Solves, history.Solves.Length - count, result, 0, count);
-            return result;
+                var result = new Solve[count];
+                Array.Copy(history.Solves, history.Solves.Length - count, result, 0, count);
+                callback(result);
+            });
         }
 
         public static SolveHistory Empty => new SolveHistory();

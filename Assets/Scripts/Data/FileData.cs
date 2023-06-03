@@ -8,7 +8,7 @@ namespace Kubewatch.Data
     {
         public static string GetDirectory()
         {
-            string path = Application.persistentDataPath;
+            string path = _dataPath;
             if (!Directory.Exists(path)) Directory.CreateDirectory(path);
             return path;
         }
@@ -24,5 +24,13 @@ namespace Kubewatch.Data
         {
             return Path.Combine(GetDataDirectory(), fileName);
         }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void Initialize()
+        {
+            _dataPath = Application.persistentDataPath;
+        }
+
+        private static string _dataPath = null;
     }
 }
