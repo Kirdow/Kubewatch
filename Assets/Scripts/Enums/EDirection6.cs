@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Kubewatch
+namespace Kubewatch.Enums
 {
     public enum EDirection6
     {

@@ -1,4 +1,5 @@
 using UnityEngine;
+using Kubewatch.Enums;
 
 namespace Kubewatch
 {
