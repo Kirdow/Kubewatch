@@ -51,6 +51,7 @@ namespace Kubewatch
         private Scrambler _scrambler = null;
 
         private bool _scrambling = false;
+        private Coroutine _scramblingRoutine;
         
         void Awake()
         {
@@ -124,12 +125,15 @@ namespace Kubewatch
 
             ScrambleText.Text = _scrambler.Sequence;
             
-            _scrambling = false;
-            StartCoroutine(RunScrambleAnimation(_scrambler.Sequence));
+            if (_scramblingRoutine != null)
+                StopCoroutine(_scramblingRoutine);
+            _scramblingRoutine = StartCoroutine(RunScrambleAnimation(_scrambler.Sequence));
         }
 
         private IEnumerator RunScrambleAnimation(string[] sequence)
         {
+            yield return null;
+
             Face.ResetAll();
 
             yield return new WaitForSeconds(ScrambleDelay);
@@ -151,6 +155,7 @@ namespace Kubewatch
             CubeMesh.material = CubeMaterialNormal;
 
             _scrambling = false;
+            _scramblingRoutine = null;
         }
 
         private float _keyTime = -1.0f;
@@ -202,7 +207,12 @@ namespace Kubewatch
                 SetSolving(!_solveActive);
                 
                 if (state) StopTimer();
-                else StartTimer();
+                else
+                {
+                    if (_scramblingRoutine != null)
+                        StopCoroutine(_scramblingRoutine);
+                    StartTimer();
+                }
 
                 _flipMode = flipMode;
                 UpdateFlipMode(EFlipMode.None);
